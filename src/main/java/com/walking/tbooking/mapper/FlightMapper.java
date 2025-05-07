@@ -24,9 +24,9 @@ public class FlightMapper {
     }
 
     public List<ReadFlightDto> mapMany(ResultSet rs) throws MapperException, SQLException{
-        ReadFlightDto flight=new ReadFlightDto();
         LinkedList<ReadFlightDto> result=new LinkedList<>();
         while(rs.next()){
+            ReadFlightDto flight=new ReadFlightDto();
             flight.setId(rs.getLong("id"));
             flight.setDeparture_airport(rs.getString("departure_airport"));
             flight.setDeparture_time(rs.getTimestamp("departure_time").toLocalDateTime());

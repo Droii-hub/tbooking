@@ -60,7 +60,7 @@ public class UserRepository {
         String sql= """
                 update booking_user set surname=?,
                 name=?,
-                patronymic=? where id=? returning (id, email, surname, name, patronymic, lastEnter, blocked)""";
+                patronymic=? where id=? returning *""";
         try(Connection connection=dataSource.getConnection();
             PreparedStatement statement=connection.prepareStatement(sql)){
             statement.setString(1, updateUserDto.getSurname());
@@ -99,7 +99,7 @@ public class UserRepository {
 
     public List<ReadUserDto> readAll()throws SQLException, MapperException {
         String sql = """
-                select (id, email, surname, name, patronymic, lastEnter, blocked)
+                select id, email, surname, name, patronymic, last_enter, blocked
                 from booking_user
                 """;
         try (Connection connection = dataSource.getConnection();

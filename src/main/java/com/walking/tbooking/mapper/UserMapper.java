@@ -25,9 +25,9 @@ public class UserMapper {
     }
 
     public List<ReadUserDto> mapMany(ResultSet rs) throws MapperException, SQLException {
-        ReadUserDto user=new ReadUserDto();
         LinkedList<ReadUserDto> result=new LinkedList<>();
         while (rs.next()){
+            ReadUserDto user=new ReadUserDto();
             user.setId(rs.getLong("id"));
             user.setEmail(rs.getString("email"));
             user.setSurname(rs.getString("surname"));

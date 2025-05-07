@@ -30,9 +30,9 @@ public class TicketMapper {
     }
 
     public List<FullTicketDto> mapMany(ResultSet rs) throws MapperException, SQLException{
-        FullTicketDto ticket=new FullTicketDto();
         LinkedList<FullTicketDto> result=new LinkedList<>();
         while(rs.next()){
+            FullTicketDto ticket=new FullTicketDto();
             ticket.setFlight_id(rs.getLong("flight_id"));
             ticket.setDeparture_airport(rs.getString("departure_airport"));
             ticket.setDeparture_time(rs.getTimestamp("departure_time").toLocalDateTime());

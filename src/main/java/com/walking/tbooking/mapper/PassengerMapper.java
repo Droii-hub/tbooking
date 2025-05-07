@@ -28,9 +28,9 @@ public class PassengerMapper {
     }
 
     public List<ReadPassengerDto> mapMany(ResultSet rs) throws MapperException, SQLException{
-        ReadPassengerDto passenger=new ReadPassengerDto();
         LinkedList<ReadPassengerDto> result=new LinkedList<>();
         while (!rs.next()){
+            ReadPassengerDto passenger=new ReadPassengerDto();
             passenger.setId(rs.getLong("id"));
             passenger.setUser_id(rs.getLong("user_id"));
             passenger.setSurname(rs.getString("surname"));
