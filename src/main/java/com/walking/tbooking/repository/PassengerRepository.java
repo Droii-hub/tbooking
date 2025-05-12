@@ -62,8 +62,8 @@ public class PassengerRepository {
     public List<ReadPassengerDto> readBySNP(SearchPassengerDto passenger) throws MapperException, SQLException{
         String sql= """
                 select * from passenger where
-                surname ilike ?,
-                name ilike ?,
+                surname ilike ? and
+                name ilike ? and
                 patronymic ilike ?
                 """;
         try(Connection connection=dataSource.getConnection();
@@ -88,7 +88,7 @@ public class PassengerRepository {
                 passport_series=?,
                 passport_number=?,
                 passport_source=?,
-                passport_issue_date=? where id=?
+                passport_issue_date=? where id=? returning *
                 """;
         try(Connection connection=dataSource.getConnection();
         PreparedStatement checkStatement= connection.prepareStatement(checkSql);
@@ -133,6 +133,7 @@ public class PassengerRepository {
                     throw new SQLException("Passenger id does not match user id");
             }
             deleteStatement.setLong(1, passenger_id);
+            deleteStatement.executeUpdate();
         }
     }
 }

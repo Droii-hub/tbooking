@@ -21,7 +21,7 @@ public class AirportMapper {
 
     public List<AirportDto> mapMany(ResultSet rs) throws MapperException, SQLException{
         LinkedList<AirportDto> result=new LinkedList<>();
-        while(!rs.next()){
+        while(rs.next()){
             AirportDto airport=new AirportDto();
             airport.setIata(rs.getString("iata"));
             airport.setName(rs.getString("name"));
