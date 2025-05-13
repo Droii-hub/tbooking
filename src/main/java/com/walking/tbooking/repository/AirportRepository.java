@@ -23,7 +23,7 @@ public class AirportRepository {
     }
 
     public AirportDto create(AirportDto airport) throws MapperException, SQLException{
-        String sql= "insert into airport values (?, ?, ?)";
+        String sql= "insert into airport values (?, ?, ?) returning *";
         try(Connection connection=dataSource.getConnection();
             PreparedStatement statement= connection.prepareStatement(sql)){
             statement.setString(1, airport.getIata());
