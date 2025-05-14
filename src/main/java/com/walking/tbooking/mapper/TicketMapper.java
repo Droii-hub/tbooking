@@ -21,7 +21,7 @@ public class TicketMapper {
         result.setArrival_airport(rs.getString("arrival_airport"));
         result.setArrival_time(rs.getTimestamp("arrival_time").toLocalDateTime());
         result.setSeat(rs.getInt("seat"));
-        result.setService_class(rs.getString("service_class"));
+        result.setService_class(rs.getString("class"));
         result.setBaggage_allowance(rs.getString("baggage_allowance"));
         result.setSurname(rs.getString("surname"));
         result.setName(rs.getString("name"));
@@ -39,7 +39,7 @@ public class TicketMapper {
             ticket.setArrival_airport(rs.getString("arrival_airport"));
             ticket.setArrival_time(rs.getTimestamp("arrival_time").toLocalDateTime());
             ticket.setSeat(rs.getInt("seat"));
-            ticket.setService_class(rs.getString("service_class"));
+            ticket.setService_class(rs.getString("class"));
             ticket.setBaggage_allowance(rs.getString("baggage_allowance"));
             ticket.setSurname(rs.getString("surname"));
             ticket.setName(rs.getString("name"));

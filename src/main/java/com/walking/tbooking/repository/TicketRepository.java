@@ -28,12 +28,12 @@ public class TicketRepository {
     public List<FullTicketDto> readActualByUser(long user_id) throws MapperException, SQLException{
         String sql="""
                    select flight_id, departure_airport, departure_time, arrival_airport, arrival_time, seat,
-                   service_class, baggage_allowance, surname, name, patronymic
+                   class, baggage_allowance, surname, name, patronymic
                    from ticket t
-                   join (select departure_airport, departure_time, arrival_airport, arrival_time
+                   join (select id, departure_airport, departure_time, arrival_airport, arrival_time
                    from flight where departure_time>?) f on t.flight_id=f.id
                    join service_class s on t.service_class_id=s.id
-                   join (select surname, name, patronymic from passenger where user_id=?) p on t.passenger_id=p.id
+                   join (select id, surname, name, patronymic from passenger where user_id=?) p on t.passenger_id=p.id
                    """;
         try(Connection connection= dataSource.getConnection();
             PreparedStatement statement= connection.prepareStatement(sql)){
@@ -47,11 +47,11 @@ public class TicketRepository {
     public List<FullTicketDto> readAllByUser(long user_id) throws MapperException, SQLException{
         String sql="""
                    select flight_id, departure_airport, departure_time, arrival_airport, arrival_time, seat,
-                   service_class, baggage_allowance, surname, name, patronymic
+                   class, baggage_allowance, surname, name, patronymic
                    from ticket t
                    join flight f on t.flight_id=f.id
                    join service_class s on t.service_class_id=s.id
-                   join (select surname, name, patronymic from passenger where user_id=?) p on t.passenger_id=p.id
+                   join (select id, surname, name, patronymic from passenger where user_id=?) p on t.passenger_id=p.id
                    """;
         try(Connection connection= dataSource.getConnection();
             PreparedStatement statement= connection.prepareStatement(sql)){
@@ -64,7 +64,7 @@ public class TicketRepository {
     public List<FullTicketDto> readAll() throws MapperException, SQLException{
         String sql="""
                    select flight_id, departure_airport, departure_time, arrival_airport, arrival_time, seat,
-                   service_class, baggage_allowance, surname, name, patronymic
+                   class, baggage_allowance, surname, name, patronymic
                    from ticket t
                    join flight f on t.flight_id=f.id
                    join service_class s on t.service_class_id=s.id
@@ -81,6 +81,11 @@ public class TicketRepository {
         String sql="insert into ticket values (?, ?, ?, ?, ?)";
         try(Connection connection= dataSource.getConnection();
             PreparedStatement statement= connection.prepareStatement(sql)){
+            statement.setLong(1, ticket.getFlight_id());
+            statement.setInt(2,ticket.getSeat());
+            statement.setInt(3,ticket.getService_class_id());
+            statement.setString(4,ticket.getBaggage_allowance());
+            statement.setLong(5, ticket.getPassenger_id());
             statement.executeUpdate();
         }
     }
@@ -88,7 +93,7 @@ public class TicketRepository {
     public FullTicketDto read(long flight_id, int seat) throws MapperException, SQLException{
         String sql="""
                    select flight_id, departure_airport, departure_time, arrival_airport, arrival_time, seat,
-                   service_class, baggage_allowance, surname, name, patronymic
+                   class, baggage_allowance, surname, name, patronymic
                    from ticket t
                    join flight f on t.flight_id=f.id
                    join service_class s on t.service_class_id=s.id
