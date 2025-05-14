@@ -25,9 +25,7 @@ import java.time.LocalDate;
 public class PassengerRepositoryTest {
     private HikariDataSource dataSource;
     private PassengerRepository passengerRepository;
-    private UserRepository userRepository;
     private ReadUserDto firstUser;
-    private ReadUserDto secondUser;
     private CreatePassengerDto passengerDto;
 
     @BeforeEach
@@ -39,18 +37,18 @@ public class PassengerRepositoryTest {
                 .dataSource(dataSource);
         Flyway flyway=flywayConfig.load();
         flyway.migrate();
-        userRepository=new UserRepository(dataSource,new UserMapper());
+        UserRepository userRepository = new UserRepository(dataSource, new UserMapper());
         CreateUserDto userDto=new CreateUserDto();
         userDto.setEmail("test@email.com");
         userDto.setSurname("Petrov");
         userDto.setName("Ivan");
         userDto.setPatronymic("Aleksandrovich");
         userDto.setPassword("GreatPassword");
-        firstUser=userRepository.create(userDto, 2);
+        firstUser= userRepository.create(userDto, 2);
         userDto.setEmail("test2@email.com");
         userDto.setSurname("Ivanov");
         userDto.setName("Petr");
-        secondUser=userRepository.create(userDto, 2);
+        ReadUserDto secondUser = userRepository.create(userDto, 2);
         passengerDto=new CreatePassengerDto();
         passengerDto.setSurname("Petrov");
         passengerDto.setName("Ivan");

@@ -42,9 +42,19 @@ public class FlightRepository {
         }
     }
 
+    public ReadFlightDto readById(long id) throws SQLException, MapperException{
+        String sql="select * from flight where id=?";
+        try(Connection connection=dataSource.getConnection();
+        PreparedStatement statement=connection.prepareStatement(sql)){
+            statement.setLong(1,id);
+            var rs=statement.executeQuery();
+            return mapper.map(rs);
+        }
+    }
+
     public SeatsDto readSeats(long id) throws SQLException{
         String sql="select seat from ticket where flight_id=?";
-        String totalSql="select total_seats from flight where flight_id=?";
+        String totalSql="select total_seats from flight where id=?";
         try(Connection connection= dataSource.getConnection();
             PreparedStatement statement= connection.prepareStatement(sql);
             PreparedStatement statementTotal=connection.prepareStatement(totalSql)){
@@ -65,7 +75,7 @@ public class FlightRepository {
     }
 
     public List<ReadFlightDto> readByAirports(ReadByAirportsFlightDto airports) throws MapperException, SQLException{
-        String sql="select * from flight where departure_airport ilike ?, arrival_airport ilike ?";
+        String sql="select * from flight where departure_airport ilike ? and arrival_airport ilike ?";
         try(Connection connection= dataSource.getConnection();
             PreparedStatement statement= connection.prepareStatement(sql)){
             statement.setString(1, airports.getDeparture_airport()==null ? "%" : airports.getDeparture_airport());
