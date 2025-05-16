@@ -1,18 +1,25 @@
 package com.walking.tbooking.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.walking.tbooking.dto.passenger.CreatePassengerDto;
 import com.walking.tbooking.dto.passenger.ReadPassengerDto;
 import com.walking.tbooking.dto.passenger.SearchPassengerDto;
 import com.walking.tbooking.dto.passenger.UpdatePassengerDto;
+import com.walking.tbooking.exception.MapperException;
+import com.walking.tbooking.mapper.PassengerJsonMapper;
+import com.walking.tbooking.mapper.PassengerMapper;
+import com.walking.tbooking.repository.PassengerRepository;
 
 import javax.sql.DataSource;
+import java.sql.SQLException;
 import java.util.List;
 
 public class PassengerService {
     private static PassengerService instance;
 
     private PassengerService(DataSource dataSource){
-        this.dataSource=dataSource;
+        repository=new PassengerRepository(dataSource,new PassengerMapper());
+        mapper=new PassengerJsonMapper();
     }
 
     public static PassengerService getInstance(DataSource dataSource){
@@ -22,25 +29,26 @@ public class PassengerService {
         return instance;
     }
 
-    private final DataSource dataSource;
+    private final PassengerRepository repository;
+    private final PassengerJsonMapper mapper;
 
-    public ReadPassengerDto create(CreatePassengerDto passenger, long user_id){
-        throw new RuntimeException("Not implemented");
+    public String create(String passenger, long user_id) throws JsonProcessingException, SQLException, MapperException {
+        return mapper.getString(repository.create(mapper.getCreatePassengerDto(passenger),user_id));
     }
 
-    public List<ReadPassengerDto> getByUserId(long user_id){
-        throw new RuntimeException("Not implemented");
+    public String getByUserId(long user_id) throws SQLException, MapperException, JsonProcessingException {
+        return mapper.getString(repository.readByUserId(user_id));
     }
 
-    public List<ReadPassengerDto> getBySNP(SearchPassengerDto passenger){
-        throw new RuntimeException("Not implemented");
+    public String getBySNP(String passenger) throws JsonProcessingException, SQLException, MapperException {
+        return mapper.getString(repository.readBySNP(mapper.getSearchPassengerDto(passenger)));
     }
 
-    public ReadPassengerDto update(UpdatePassengerDto passenger, long user_id){
-        throw new RuntimeException("Not implemented");
+    public String update(String passenger, long user_id) throws JsonProcessingException, SQLException, MapperException {
+        return mapper.getString(repository.update(mapper.getUpdatePassengerDto(passenger), user_id));
     }
 
-    public void delete(long passenger_id, long user_id){
-        throw new RuntimeException("Not implemented");
+    public void delete(long passenger_id, long user_id) throws SQLException {
+        repository.delete(passenger_id,user_id);
     }
 }
