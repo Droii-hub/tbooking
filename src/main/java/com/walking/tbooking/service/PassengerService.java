@@ -17,14 +17,14 @@ import java.util.List;
 public class PassengerService {
     private static PassengerService instance;
 
-    private PassengerService(DataSource dataSource){
-        repository=new PassengerRepository(dataSource,new PassengerMapper());
-        mapper=new PassengerJsonMapper();
+    private PassengerService(PassengerRepository repository, PassengerJsonMapper mapper){
+        this.repository=repository;
+        this.mapper=mapper;
     }
 
-    public static PassengerService getInstance(DataSource dataSource){
+    public static PassengerService getInstance(PassengerRepository repository, PassengerJsonMapper mapper){
         if(instance==null){
-            instance=new PassengerService(dataSource);
+            instance=new PassengerService(repository, mapper);
         }
         return instance;
     }

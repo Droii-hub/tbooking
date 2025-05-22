@@ -53,7 +53,7 @@ public class FlightRepository {
     }
 
     public SeatsDto readSeats(long id) throws SQLException{
-        String sql="select seat from ticket where flight_id=?";
+        String sql="select seat from ticket where flight_id=? order by seat";
         String totalSql="select total_seats from flight where id=?";
         try(Connection connection= dataSource.getConnection();
             PreparedStatement statement= connection.prepareStatement(sql);
