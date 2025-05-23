@@ -74,6 +74,19 @@ public class FlightRepository {
         }
     }
 
+    public int readAvailableSeats(Long id, Connection connection){
+        String sql="select available_seats from flight where id=?";
+        try(PreparedStatement statement= connection.prepareStatement(sql)){
+            statement.setLong(1,id);
+            var rs=statement.executeQuery();
+            if (!rs.next())
+                throw new SQLException("Flight with this id does not exists");
+            return rs.getInt("available_seats");
+        } catch (SQLException e){
+            throw new RuntimeException("Ошибка при чтении с базы "+e.getMessage());
+        }
+    }
+
     public List<ReadFlightDto> readByAirports(ReadByAirportsFlightDto airports) throws MapperException, SQLException{
         String sql="select * from flight where departure_airport ilike ? and arrival_airport ilike ?";
         try(Connection connection= dataSource.getConnection();
@@ -118,13 +131,14 @@ public class FlightRepository {
         }
     }
 
-    public void updateAvailableSeats(long id, int availableSeats) throws SQLException{
+    public void updateAvailableSeats(long id, int availableSeats, Connection connection){
         String sql="update flight set available_seats=? where id=?";
-        try(Connection connection= dataSource.getConnection();
-            PreparedStatement statement= connection.prepareStatement(sql)){
+        try(PreparedStatement statement= connection.prepareStatement(sql)){
             statement.setInt(1,availableSeats);
             statement.setLong(2, id);
             statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при записи в базу "+e.getMessage());
         }
     }
 

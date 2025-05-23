@@ -146,7 +146,7 @@ public class TicketRepositoryTest {
         String sql="select baggage_allowance from ticket where flight_id=? and seat=?";
         String actual;
         //when
-        ticketRepository.book(ticketDto);
+        ticketRepository.book(ticketDto, dataSource.getConnection());
         try(Connection connection= dataSource.getConnection();
         PreparedStatement statement= connection.prepareStatement(sql)){
             statement.setLong(1, ticketDto.getFlight_id());
@@ -162,9 +162,9 @@ public class TicketRepositoryTest {
     @Test
     void read_success() throws SQLException, MapperException{
         //given
-        ticketRepository.book(ticketDto);
+        ticketRepository.book(ticketDto, dataSource.getConnection());
         //when
-        var actual=ticketRepository.read(ticketDto.getFlight_id(), ticketDto.getSeat());
+        var actual=ticketRepository.read(ticketDto.getFlight_id(), ticketDto.getSeat(), dataSource.getConnection());
         //then
         Assertions.assertEquals(passenger.getSurname(), actual.getSurname());
     }
@@ -172,9 +172,9 @@ public class TicketRepositoryTest {
     @Test
     void readActualByUser_success() throws SQLException, MapperException{
         //given
-        ticketRepository.book(ticketDto);
-        ticketRepository.book(actualTicketDto);
-        ticketRepository.book(anotherUserTicketDto);
+        ticketRepository.book(ticketDto, dataSource.getConnection());
+        ticketRepository.book(actualTicketDto, dataSource.getConnection());
+        ticketRepository.book(anotherUserTicketDto, dataSource.getConnection());
         //when
         var actual=ticketRepository.readActualByUser(user.getId());
         //then
@@ -185,9 +185,9 @@ public class TicketRepositoryTest {
     @Test
     void readAllByUser_success() throws SQLException, MapperException {
         //given
-        ticketRepository.book(ticketDto);
-        ticketRepository.book(actualTicketDto);
-        ticketRepository.book(anotherUserTicketDto);
+        ticketRepository.book(ticketDto, dataSource.getConnection());
+        ticketRepository.book(actualTicketDto, dataSource.getConnection());
+        ticketRepository.book(anotherUserTicketDto, dataSource.getConnection());
         //when
         var actual=ticketRepository.readAllByUser(user.getId());
         Assertions.assertEquals(2, actual.size());
@@ -197,9 +197,9 @@ public class TicketRepositoryTest {
     @Test
     void readAll_success() throws SQLException, MapperException {
         //given
-        ticketRepository.book(ticketDto);
-        ticketRepository.book(actualTicketDto);
-        ticketRepository.book(anotherUserTicketDto);
+        ticketRepository.book(ticketDto, dataSource.getConnection());
+        ticketRepository.book(actualTicketDto, dataSource.getConnection());
+        ticketRepository.book(anotherUserTicketDto, dataSource.getConnection());
         //when
         var actual=ticketRepository.readAll();
         Assertions.assertEquals(3, actual.size());
@@ -209,14 +209,26 @@ public class TicketRepositoryTest {
     @Test
     void delete_success() throws SQLException, MapperException {
         //given
-        ticketRepository.book(ticketDto);
-        ticketRepository.book(actualTicketDto);
-        ticketRepository.book(anotherUserTicketDto);
+        ticketRepository.book(ticketDto, dataSource.getConnection());
+        ticketRepository.book(actualTicketDto, dataSource.getConnection());
+        ticketRepository.book(anotherUserTicketDto, dataSource.getConnection());
         //when
-        ticketRepository.delete(anotherUserTicketDto.getFlight_id(), anotherUserTicketDto.getSeat());
+        ticketRepository.delete(anotherUserTicketDto.getFlight_id(), anotherUserTicketDto.getSeat(), dataSource.getConnection());
         var actual=ticketRepository.readAll();
         Assertions.assertEquals(2, actual.size());
         Assertions.assertEquals(actualTicketDto.getFlight_id(), actual.getLast().getFlight_id());
+    }
+
+    @Test
+    void readUserIdByTicket_success() throws SQLException {
+        //given
+        ticketRepository.book(ticketDto, dataSource.getConnection());
+        ticketRepository.book(actualTicketDto, dataSource.getConnection());
+        ticketRepository.book(anotherUserTicketDto, dataSource.getConnection());
+        //when
+        long actual=ticketRepository.readUserIdByTicket(ticketDto.getFlight_id(), ticketDto.getSeat());
+        //then
+        Assertions.assertEquals(user.getId(), actual);
     }
 
 

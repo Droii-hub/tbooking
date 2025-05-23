@@ -77,20 +77,21 @@ public class TicketRepository {
         }
     }
 
-    public void book(TicketDto ticket) throws SQLException{
+    public void book(TicketDto ticket, Connection connection){
         String sql="insert into ticket values (?, ?, ?, ?, ?)";
-        try(Connection connection= dataSource.getConnection();
-            PreparedStatement statement= connection.prepareStatement(sql)){
+        try(PreparedStatement statement= connection.prepareStatement(sql)){
             statement.setLong(1, ticket.getFlight_id());
             statement.setInt(2,ticket.getSeat());
             statement.setInt(3,ticket.getService_class_id());
             statement.setString(4,ticket.getBaggage_allowance());
             statement.setLong(5, ticket.getPassenger_id());
             statement.executeUpdate();
+        } catch (SQLException e){
+            throw new RuntimeException("Не удалось добавить билет в базу "+e.getMessage());
         }
     }
 
-    public FullTicketDto read(long flight_id, int seat) throws MapperException, SQLException{
+    public FullTicketDto read(long flight_id, int seat, Connection connection){
         String sql="""
                    select flight_id, departure_airport, departure_time, arrival_airport, arrival_time, seat,
                    class, baggage_allowance, surname, name, patronymic
@@ -100,22 +101,42 @@ public class TicketRepository {
                    join passenger p on t.passenger_id=p.id
                    where flight_id=? and seat=?
                    """;
-        try(Connection connection= dataSource.getConnection();
-            PreparedStatement statement= connection.prepareStatement(sql)){
+        try(PreparedStatement statement= connection.prepareStatement(sql)){
             statement.setLong(1,flight_id);
             statement.setInt(2, seat);
             var rs=statement.executeQuery();
             return mapper.map(rs);
+        } catch (SQLException | MapperException e) {
+            if (e instanceof SQLException sqlException)
+                throw new RuntimeException("Ошибка при чтении с базы "+ e.getMessage());
+            throw new RuntimeException("Ошибка преобразования данных с базы "+e.getMessage());
         }
     }
 
-    public void delete(long flight_id, int seat) throws MapperException, SQLException{
+    public void delete(long flight_id, int seat, Connection connection){
         String sql="delete from ticket where flight_id=? and seat=?";
-        try(Connection connection= dataSource.getConnection();
-            PreparedStatement statement= connection.prepareStatement(sql)) {
+        try(PreparedStatement statement= connection.prepareStatement(sql)) {
             statement.setLong(1, flight_id);
             statement.setInt(2, seat);
             statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при удалении билета "+e.getMessage());
+        }
+    }
+
+    public long readUserIdByTicket(long flight_id, int seat)throws SQLException{
+        String sql="""
+    select id, user_id from passenger
+    join (select passenger_id from ticket where flight_id=? and seat=?) t
+    on t.passenger_id=id""";
+        try(Connection connection=dataSource.getConnection();
+        PreparedStatement statement= connection.prepareStatement(sql)){
+            statement.setLong(1, flight_id);
+            statement.setInt(2, seat);
+            var rs=statement.executeQuery();
+            if (!rs.next())
+                throw new SQLException("Такого билета не найдено");
+            return rs.getLong("user_id");
         }
     }
 }

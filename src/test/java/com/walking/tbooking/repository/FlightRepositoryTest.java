@@ -142,7 +142,7 @@ public class FlightRepositoryTest {
         //given
         var flight=flightRepository.create(createFlightDto);
         //when
-        flightRepository.updateAvailableSeats(flight.getId(),119);
+        flightRepository.updateAvailableSeats(flight.getId(),119, dataSource.getConnection());
         //then
         Assertions.assertEquals(119,
                 flightRepository.readById(flight.getId()).getAvailable_seats());
