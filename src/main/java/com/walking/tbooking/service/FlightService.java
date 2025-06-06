@@ -1,16 +1,12 @@
 package com.walking.tbooking.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.walking.tbooking.dto.flight.CreateFlightDto;
 import com.walking.tbooking.dto.flight.ReadByAirportsFlightDto;
 import com.walking.tbooking.dto.flight.ReadFlightDto;
 import com.walking.tbooking.dto.flight.SeatsDto;
 import com.walking.tbooking.exception.MapperException;
-import com.walking.tbooking.mapper.FlightJsonMapper;
-import com.walking.tbooking.mapper.FlightMapper;
 import com.walking.tbooking.repository.FlightRepository;
 
-import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -18,25 +14,23 @@ import java.util.List;
 
 public class FlightService {
     private static FlightService instance;
-    private FlightService(FlightRepository repository, FlightJsonMapper mapper){
+    private FlightService(FlightRepository repository){
         this.repository=repository;
-        this.mapper=mapper;
     }
-    public static FlightService getInstance(FlightRepository repository, FlightJsonMapper mapper){
+    public static FlightService getInstance(FlightRepository repository){
         if(instance==null){
-            instance=new FlightService(repository, mapper);
+            instance=new FlightService(repository);
         }
         return instance;
     }
 
     private final FlightRepository repository;
-    private final FlightJsonMapper mapper;
 
-    public String create(String flight) throws JsonProcessingException, SQLException, MapperException {
-        return mapper.getString(repository.create(mapper.getCreateFlightDto(flight)));
+    public ReadFlightDto create(CreateFlightDto flight) throws SQLException, MapperException {
+        return repository.create(flight);
     }
 
-    public String getAvailableSeats(long id) throws SQLException, JsonProcessingException {
+    public List<Boolean> getAvailableSeats(long id) throws SQLException {
         SeatsDto seats=repository.readSeats(id);
         LinkedList<Integer> unavailableSeats=new LinkedList<>(seats.getUnavailableSeats());
         List<Boolean> availableSeats=new ArrayList<>(seats.getTotalSeats());
@@ -48,20 +42,19 @@ public class FlightService {
                 availableSeats.add(i, true);
             }
         }
-        return mapper.getString(availableSeats);
+        return availableSeats;
     }
 
-    public String getFlightByAirports(String airports) throws JsonProcessingException, SQLException, MapperException {
-        return mapper.getStringByListReadFlightDto(
-                repository.readByAirports(mapper.getReadByAirportsFlightDto(airports)));
+    public List<ReadFlightDto> getFlightByAirports(ReadByAirportsFlightDto airports) throws SQLException, MapperException {
+        return repository.readByAirports(airports);
     }
 
-    public String getAll() throws SQLException, MapperException, JsonProcessingException {
-        return mapper.getStringByListReadFlightDto(repository.readAll());
+    public List<ReadFlightDto> getAll() throws SQLException, MapperException {
+        return repository.readAll();
     }
 
-    public String update(String flight) throws JsonProcessingException, SQLException, MapperException {
-        return mapper.getString(repository.update(mapper.getReadFlightDto(flight)));
+    public ReadFlightDto update(ReadFlightDto flight) throws SQLException, MapperException {
+        return repository.update(flight);
     }
 
     public void delete(long id) throws SQLException {

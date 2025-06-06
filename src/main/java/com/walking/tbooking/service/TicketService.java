@@ -1,9 +1,7 @@
 package com.walking.tbooking.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.walking.tbooking.dto.ticket.FullTicketDto;
 import com.walking.tbooking.exception.MapperException;
-import com.walking.tbooking.mapper.TicketJsonMapper;
 import com.walking.tbooking.repository.TicketRepository;
 
 import java.sql.SQLException;
@@ -11,29 +9,27 @@ import java.util.List;
 
 public class TicketService {
     private static TicketService instance;
-    private TicketService(TicketRepository repository, TicketJsonMapper mapper){
+    private TicketService(TicketRepository repository){
         this.repository=repository;
-        this.mapper=mapper;
     }
-    public static TicketService getInstance(TicketRepository repository, TicketJsonMapper mapper){
+    public static TicketService getInstance(TicketRepository repository){
         if(instance==null){
-            instance=new TicketService(repository, mapper);
+            instance=new TicketService(repository);
         }
         return instance;
     }
 
     private final TicketRepository repository;
-    private final TicketJsonMapper mapper;
 
-    public String getActualByUser(long user_id) throws SQLException, MapperException, JsonProcessingException {
-        return mapper.getString(repository.readActualByUser(user_id));
+    public List<FullTicketDto> getActualByUser(long user_id) throws SQLException, MapperException {
+        return repository.readActualByUser(user_id);
     }
 
-    public String getAllByUser(long user_id) throws SQLException, MapperException, JsonProcessingException {
-        return mapper.getString(repository.readAllByUser(user_id));
+    public List<FullTicketDto> getAllByUser(long user_id) throws SQLException, MapperException {
+        return repository.readAllByUser(user_id);
     }
 
-    public String getAll() throws SQLException, MapperException, JsonProcessingException {
-        return mapper.getString(repository.readAll());
+    public List<FullTicketDto> getAll() throws SQLException, MapperException {
+        return repository.readAll();
     }
 }

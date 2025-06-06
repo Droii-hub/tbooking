@@ -12,4 +12,13 @@
         <listener>
                 <listener-class>com.walking.tbooking.listener.InitParamsListener</listener-class>
         </listener>
+
+        <filter>
+                <filter-name>DeserializationFilter</filter-name>
+                <filter-class>com.walking.tbooking.filter.DeserializationFilter</filter-class>
+        </filter>
+        <filter>
+                <filter-name>SerializationFilter</filter-name>
+                <filter-class>com.walking.tbooking.filter.SerializationFilter</filter-class>
+        </filter>
 </web-app>

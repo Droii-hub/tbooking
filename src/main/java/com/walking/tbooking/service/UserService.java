@@ -1,58 +1,60 @@
 package com.walking.tbooking.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.walking.tbooking.dto.user.CreateUserDto;
+import com.walking.tbooking.dto.user.ReadUserDto;
+import com.walking.tbooking.dto.user.UpdateUserDto;
 import com.walking.tbooking.exception.MapperException;
-import com.walking.tbooking.mapper.UserJsonMapper;
 import com.walking.tbooking.repository.UserRepository;
 
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 
 public class UserService {
     private static UserService instance;
 
-    private UserService(UserRepository repository, UserJsonMapper mapper){
+    private UserService(UserRepository repository){
         this.repository =repository;
-        this.mapper=mapper;
     }
-    public static UserService getInstance(UserRepository repository, UserJsonMapper mapper){
+    public static UserService getInstance(UserRepository repository){
         if(instance==null){
-            instance=new UserService(repository, mapper);
+            instance=new UserService(repository);
         }
         return instance;
     }
 
     private final UserRepository repository;
-    private final UserJsonMapper mapper;
 
-    public String create(String json, int roleId) throws SQLException, MapperException, JsonProcessingException {
-        return mapper.getString(repository.create(mapper.getCreateUserDto(json), roleId));
+    public ReadUserDto create(CreateUserDto createUserDto, int roleId) throws SQLException, MapperException, JsonProcessingException {
+        return repository.create(createUserDto,roleId);
     }
 
     public void updateLastEnter(long id) throws SQLException {
         repository.updateLastEnter(id);
     }
 
-    public String updateData(String json) throws SQLException, MapperException, JsonProcessingException {
-        return mapper.getString(repository.updateData(mapper.getUpdateUserDto(json)));
+    public ReadUserDto updateData(UpdateUserDto updateUserDto) throws SQLException, MapperException {
+        return repository.updateData(updateUserDto);
     }
 
     public void updatePassword(long id, String password) throws SQLException {
         repository.updatePassword(id,password);
     }
 
-    public String readById(long id) throws SQLException, MapperException, JsonProcessingException {
-        return mapper.getString(repository.readById(id));
+    public ReadUserDto readById(long id) throws SQLException, MapperException {
+        return repository.readById(id);
     }
 
-    public String readAll() throws SQLException, MapperException, JsonProcessingException {
-        return mapper.getString(repository.readAll());
+    public List<ReadUserDto> readAll() throws SQLException, MapperException {
+        return repository.readAll();
     }
 
     public void ban(long id, boolean ban) throws SQLException {
         repository.ban(id,ban);
     }
 
-    public void ban(String json) throws SQLException, JsonProcessingException{
-        repository.ban(mapper.getMap(json));
+    public void ban(Map<Long,Boolean> banList) throws SQLException {
+        repository.ban(banList);
     }
 }
