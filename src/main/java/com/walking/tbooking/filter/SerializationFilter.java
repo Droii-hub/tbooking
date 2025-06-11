@@ -14,10 +14,11 @@ public class SerializationFilter extends HttpFilter {
     private ObjectMapper mapper;
 
     @Override
+    public void init(){
+        mapper=(ObjectMapper) getFilterConfig().getServletContext().getAttribute("objectMapper");
+    }
+    @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws ServletException, IOException {
-        //Инициализируем маппер, если еще не
-        if (mapper==null)
-            mapper=(ObjectMapper) getFilterConfig().getServletContext().getAttribute("objectMapper");
         //Ждем отработки остальных фильтров и сервлетов
         chain.doFilter(req,res);
         //Получаем объект для сериализации, установленный в сервлете
