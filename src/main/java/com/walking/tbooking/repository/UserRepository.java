@@ -4,7 +4,7 @@ import com.walking.tbooking.PasswordProvider;
 import com.walking.tbooking.dto.user.CreateUserDto;
 import com.walking.tbooking.dto.user.ReadUserDto;
 import com.walking.tbooking.dto.user.UpdateUserDto;
-import com.walking.tbooking.exception.MapperException;
+import com.walking.tbooking.exception.BadRequestException;
 import com.walking.tbooking.mapper.UserMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,7 +28,7 @@ public class UserRepository {
         this.userMapper=userMapper;
     }
 
-    public ReadUserDto create(CreateUserDto createUserDto, int roleId) throws MapperException, SQLException {
+    public ReadUserDto create(CreateUserDto createUserDto, int roleId){
         String sql= """
                 insert into booking_user (email, password, surname, name, patronymic, role_id)
                  values (?, ?, ?, ?, ?, ?) returning *
@@ -43,20 +43,34 @@ public class UserRepository {
             statement.setInt(6,roleId);
             var rs=statement.executeQuery();
             return userMapper.map(rs);
+        } catch (SQLException e){
+            if (e.getMessage().contains("ERROR: duplicate key value violates unique constraint \"booking_user_email_key\"")){
+                log.info("This email already in use: {}", createUserDto.getEmail());
+                throw new BadRequestException("This email already in use");
+            }
+            if (e.getMessage().contains("ERROR: new row for relation \"booking_user\" violates check constraint \"booking_user_email_check\"")){
+                log.info("Invalid email format: {}", createUserDto.getEmail());
+                throw new BadRequestException("Invalid email format");
+            }
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
-    public void updateLastEnter(long id) throws SQLException{
+    public void updateLastEnter(long id){
         String sql= "update booking_user set last_enter=? where id=?";
         try(Connection connection=dataSource.getConnection();
             PreparedStatement statement=connection.prepareStatement(sql)){
             statement.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
             statement.setLong(2, id);
             statement.executeUpdate();
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
-    public ReadUserDto updateData(UpdateUserDto updateUserDto) throws SQLException, MapperException{
+    public ReadUserDto updateData(UpdateUserDto updateUserDto){
         String sql= """
                 update booking_user set surname=?,
                 name=?,
@@ -69,10 +83,13 @@ public class UserRepository {
             statement.setLong(4, updateUserDto.getId());
             var rs=statement.executeQuery();
             return userMapper.map(rs);
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
-    public void updatePassword(long id, String password)throws SQLException{
+    public void updatePassword(long id, String password){
         String sql= """
                 update booking_user set password=? where id=?""";
         try(Connection connection=dataSource.getConnection();
@@ -80,46 +97,78 @@ public class UserRepository {
             statement.setString(1, PasswordProvider.hashPassword(password));
             statement.setLong(2, id);
             statement.executeUpdate();
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
-    public ReadUserDto readById(long id)throws SQLException, MapperException{
+    public ReadUserDto readByEmail(String email){
         String sql= """
-                select id, email, surname, name, patronymic, last_enter, blocked
+                select id, email, surname, name, patronymic, last_enter, blocked, role_id
                 from booking_user
-                where id=?
+                where email=?
                 """;
+        try(Connection connection=dataSource.getConnection();
+            PreparedStatement statement=connection.prepareStatement(sql)){
+            statement.setString(1, email);
+            var rs=statement.executeQuery();
+            return userMapper.map(rs);
+        } catch (SQLException e) {
+            if (e.getMessage().contains("ResultSet have not value")) {
+                log.info("Wrong email: {}", email);
+                throw new BadRequestException("Wrong email");
+            }
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    public String passwordById(long id){
+        String sql= """
+                select password from booking_user where id=?""";
         try(Connection connection=dataSource.getConnection();
             PreparedStatement statement=connection.prepareStatement(sql)){
             statement.setLong(1, id);
             var rs=statement.executeQuery();
-            return userMapper.map(rs);
+            if(!rs.next())
+                return  null;
+            return rs.getString("password");
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
-    public List<ReadUserDto> readAll()throws SQLException, MapperException {
+    public List<ReadUserDto> readAll(){
         String sql = """
-                select id, email, surname, name, patronymic, last_enter, blocked
+                select id, email, surname, name, patronymic, last_enter, blocked, role_id
                 from booking_user
                 """;
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             var rs = statement.executeQuery();
             return userMapper.mapMany(rs);
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
-    public void ban(long id, boolean ban) throws SQLException{
+    public void ban(long id, boolean ban){
         String sql="update booking_user set blocked=? where id=?";
         try(Connection connection=dataSource.getConnection();
             PreparedStatement statement=connection.prepareStatement(sql)){
             statement.setBoolean(1, ban);
             statement.setLong(2, id);
             statement.executeUpdate();
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
-    public void ban(Map<Long,Boolean> banList)throws SQLException{
+    public void ban(Map<Long,Boolean> banList){
         String sql="update booking_user set blocked=? where id=?";
         try(Connection connection=dataSource.getConnection();
             PreparedStatement statement=connection.prepareStatement(sql)){
@@ -129,6 +178,9 @@ public class UserRepository {
                 statement.addBatch();
             }
             statement.executeBatch();
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 }

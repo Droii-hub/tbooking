@@ -3,6 +3,7 @@ package com.walking.tbooking.repository;
 import com.walking.tbooking.dto.user.CreateUserDto;
 import com.walking.tbooking.dto.user.ReadUserDto;
 import com.walking.tbooking.dto.user.UpdateUserDto;
+import com.walking.tbooking.exception.BadRequestException;
 import com.walking.tbooking.exception.MapperException;
 import com.walking.tbooking.mapper.UserMapper;
 import com.zaxxer.hikari.HikariConfig;
@@ -76,31 +77,44 @@ public class UserRepositoryTest {
     }
 
     @Test
-    public void createWithSameEmail_fail() throws SQLException, MapperException {
+    public void createWithSameEmail_fail(){
         //given
         userRepository.create(createUserDto, 1);
         createUserDto.setSurname("Ivanov");
         //when
-        SQLException thrown=Assertions.assertThrows(SQLException.class, ()->{
+        BadRequestException thrown=Assertions.assertThrows(BadRequestException.class, ()->{
             userRepository.create(createUserDto, 1);
         });
         //then
         Assertions.assertTrue(thrown.getMessage()
-                .contains("ERROR: duplicate key value violates unique constraint \"booking_user_email_key\""));
+                .contains("This email already in use"));
     }
 
     @Test
-    public void readById_success() throws SQLException, MapperException {
+    public void createWithWrongEmail_fail(){
+        //given
+        createUserDto.setEmail("123");
+        //when
+        BadRequestException thrown=Assertions.assertThrows(BadRequestException.class, ()->{
+            userRepository.create(createUserDto, 1);
+        });
+        //then
+        Assertions.assertTrue(thrown.getMessage()
+                .contains("Invalid email format"));
+    }
+
+    @Test
+    public void readByEmail_success(){
         //given
         var user=userRepository.create(createUserDto, 1);
         //when
-        var actual=userRepository.readById(user.getId());
+        var actual=userRepository.readByEmail(user.getEmail());
         //then
         Assertions.assertEquals(user.getEmail(), actual.getEmail());
     }
 
     @Test
-    public void updateLastEnter_success() throws SQLException, MapperException {
+    public void updateLastEnter_success(){
         //given
         var firstRequest=userRepository.create(createUserDto, 1);
         LocalDateTime before=LocalDateTime.now();
@@ -108,14 +122,14 @@ public class UserRepositoryTest {
         //when
         userRepository.updateLastEnter(firstRequest.getId());
         LocalDateTime after=LocalDateTime.now();
-        var secondRequest=userRepository.readById(firstRequest.getId());
+        var secondRequest=userRepository.readByEmail(firstRequest.getEmail());
         //then
         Assertions.assertTrue(before.isBefore(secondRequest.getLastEnter())
                 &secondRequest.getLastEnter().isBefore(after));
     }
 
     @Test
-    void updateData_success()throws SQLException, MapperException{
+    void updateData_success(){
         //given
         var createdUser=userRepository.create(createUserDto, 1);
         UpdateUserDto changes=new UpdateUserDto();
@@ -129,28 +143,30 @@ public class UserRepositoryTest {
         Assertions.assertEquals(changes.getSurname(), updatedUser.getSurname());
     }
 
-    private String passwordById(long id) throws SQLException {
-        String sql= """
-                select password from booking_user where id=?""";
-        try(Connection connection=dataSource.getConnection();
-            PreparedStatement statement=connection.prepareStatement(sql)){
-            statement.setLong(1, id);
-            var rs=statement.executeQuery();
-            rs.next();
-            return rs.getString("password");
-        }
-    }
-
     @Test
     void updatePassword() throws SQLException, MapperException {
         //given
         var createdUser=userRepository.create(createUserDto, 1);
-        String beforeUpdate=passwordById(createdUser.getId());
+        String beforeUpdate=userRepository.passwordById(createdUser.getId());
         //when
         userRepository.updatePassword(createdUser.getId(), "WeakPassword");
-        String afterUpdate=passwordById(createdUser.getId());
+        String afterUpdate=userRepository.passwordById(createdUser.getId());
         //then
         Assertions.assertNotEquals(beforeUpdate, afterUpdate);
+    }
+
+    @Test
+    void wrongId(){
+        //given
+        var createdUser=userRepository.create(createUserDto, 2);
+        //when
+        BadRequestException thrown=Assertions.assertThrows(BadRequestException.class, ()->{
+            userRepository.updatePassword(createdUser.getId()+1, "WeakPassword");
+        });
+        //then
+        Assertions.assertTrue(thrown.getMessage()
+                .contains("Invalid email format"));
+
     }
 
     @Test
@@ -176,7 +192,7 @@ public class UserRepositoryTest {
         var createdUser=userRepository.create(createUserDto, 1);
         //when
         userRepository.ban(createdUser.getId(), true);
-        var actual=userRepository.readById(createdUser.getId());
+        var actual=userRepository.readByEmail(createdUser.getEmail());
         //then
         Assertions.assertTrue(actual.isBlocked());
     }

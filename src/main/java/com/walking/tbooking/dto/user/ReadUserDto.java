@@ -8,6 +8,7 @@ public class ReadUserDto {
     private String surname;
     private String name;
     private String patronymic;
+    private int roleId;
     private LocalDateTime lastEnter;
     private boolean isBlocked;
 
@@ -46,7 +47,13 @@ public class ReadUserDto {
     public String getPatronymic() {
         return patronymic;
     }
+    public int getRoleId() {
+        return roleId;
+    }
 
+    public void setRoleId(int role_id) {
+        this.roleId = role_id;
+    }
     public void setPatronymic(String patronymic) {
         this.patronymic = patronymic;
     }
