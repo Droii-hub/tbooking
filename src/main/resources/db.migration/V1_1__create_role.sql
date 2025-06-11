@@ -1,5 +1,5 @@
 create table role(
-    id BIGINT PRIMARY KEY,
+    id INT PRIMARY KEY,
     role VARCHAR(100) NOT NULL
 );
 

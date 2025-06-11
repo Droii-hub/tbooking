@@ -5,7 +5,7 @@ create table booking_user (
     surname VARCHAR(100) NOT NULL,
     name VARCHAR(100) NOT NULL,
     patronymic VARCHAR(100),
-    role_id BIGINT NOT NULL REFERENCES role(id) DEFAULT 2,
+    role_id INT NOT NULL REFERENCES role(id) DEFAULT 2,
     last_enter TIMESTAMP,
     blocked BOOLEAN DEFAULT false
 );
