@@ -11,6 +11,7 @@ import com.walking.tbooking.dto.passenger.SearchPassengerDto;
 import com.walking.tbooking.dto.passenger.UpdatePassengerDto;
 import com.walking.tbooking.dto.ticket.TicketDto;
 import com.walking.tbooking.dto.user.CreateUserDto;
+import com.walking.tbooking.dto.user.LoginUserDto;
 import com.walking.tbooking.dto.user.UpdateUserDto;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -26,11 +27,13 @@ public class DeserializationFilter extends HttpFilter {
     private ObjectMapper mapper;
 
     @Override
+    public void init(){
+        mapper=(ObjectMapper) getFilterConfig().getServletContext().getAttribute("objectMapper");
+    }
+
+    @Override
     protected void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
             throws IOException, ServletException {
-        if (mapper==null)
-            mapper=(ObjectMapper) getFilterConfig().getServletContext().getAttribute("objectMapper");
-
         if (!"application/json".equals(req.getContentType()) || req.getContentLength() == 0) {
             chain.doFilter(req, res);
             return;
@@ -48,7 +51,8 @@ public class DeserializationFilter extends HttpFilter {
 
     private HashMap<String, TypeReference<?>> getClassMap() {
         HashMap<String, TypeReference<?>> result=new HashMap<>();
-        result.put("/userPOST", new TypeReference<CreateUserDto>() {});
+        result.put("/registrationPOST", new TypeReference<CreateUserDto>() {});
+        result.put("/loginPOST", new TypeReference<LoginUserDto>() {});
         result.put("/userPUT", new TypeReference<UpdateUserDto>(){});
         result.put("/user/ban/POST", new TypeReference<Map<Long, Boolean>>(){});
         result.put("/passengerPOST", new TypeReference<CreatePassengerDto>(){});
