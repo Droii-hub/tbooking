@@ -33,6 +33,10 @@ public class AuthorizationFilter extends HttpFilter {
             return;
         }
         //Условия авторизации
+        if (request.getServletPath().equals("/user")&request.getMethod().equals("GET")&!session.getAttribute("roleId").equals("1")) {
+            response.sendError(401);
+            return;
+        }
 
         chain.doFilter(request,response);
     }

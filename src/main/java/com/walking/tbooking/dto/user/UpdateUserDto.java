@@ -1,18 +1,9 @@
 package com.walking.tbooking.dto.user;
 
 public class UpdateUserDto {
-    private long id;
     private String surname;
     private String name;
     private String patronymic;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
 
     public String getSurname() {
         return surname;

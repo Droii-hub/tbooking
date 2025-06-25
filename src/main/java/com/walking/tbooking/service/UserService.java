@@ -31,8 +31,8 @@ public class UserService {
         repository.updateLastEnter(id);
     }
 
-    public ReadUserDto updateData(UpdateUserDto updateUserDto){
-        return repository.updateData(updateUserDto);
+    public ReadUserDto updateData(long id, UpdateUserDto updateUserDto){
+        return repository.updateData(id, updateUserDto);
     }
 
     public void updatePassword(long id, String password){

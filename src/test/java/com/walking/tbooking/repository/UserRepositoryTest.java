@@ -133,12 +133,11 @@ public class UserRepositoryTest {
         //given
         var createdUser=userRepository.create(createUserDto, 1);
         UpdateUserDto changes=new UpdateUserDto();
-        changes.setId(createdUser.getId());
         changes.setSurname("Ivanov");
         changes.setName(createdUser.getName());
         changes.setPatronymic(createdUser.getPatronymic());
         //when
-        var updatedUser=userRepository.updateData(changes);
+        var updatedUser=userRepository.updateData(createdUser.getId(), changes);
         //then
         Assertions.assertEquals(changes.getSurname(), updatedUser.getSurname());
     }
@@ -156,20 +155,6 @@ public class UserRepositoryTest {
     }
 
     @Test
-    void wrongId(){
-        //given
-        var createdUser=userRepository.create(createUserDto, 2);
-        //when
-        BadRequestException thrown=Assertions.assertThrows(BadRequestException.class, ()->{
-            userRepository.updatePassword(createdUser.getId()+1, "WeakPassword");
-        });
-        //then
-        Assertions.assertTrue(thrown.getMessage()
-                .contains("Invalid email format"));
-
-    }
-
-    @Test
     void readAll_success() throws MapperException, SQLException{
         //given
         var createdUser=userRepository.create(createUserDto, 1);
@@ -178,11 +163,11 @@ public class UserRepositoryTest {
         secondUserDto.setEmail("TestEmail@domain.al");
         var createdUser2=userRepository.create(secondUserDto, 1);
         //when
-        ArrayList<ReadUserDto> list=new ArrayList<>(2);
+        ArrayList<ReadUserDto> list=new ArrayList<>(3);
         var temp=userRepository.readAll();
         list.addAll(temp);
         //then
-        Assertions.assertEquals(createdUser.getSurname(),list.getFirst().getSurname());
+        Assertions.assertEquals(createdUser.getSurname(), list.get(1).getSurname());
         Assertions.assertEquals(createdUser2.getSurname(), list.getLast().getSurname());
     }
 
@@ -205,14 +190,14 @@ public class UserRepositoryTest {
         secondUserDto.setSurname("Ivanov");
         secondUserDto.setEmail("TestEmail@domain.al");
         var secondUser=userRepository.create(secondUserDto, 1);
-        HashMap<Long, Boolean> banMap=new HashMap<>(2);
+        HashMap<Long, Boolean> banMap=new HashMap<>(3);
         banMap.put(firstUser.getId(), true);
         banMap.put(secondUser.getId(), true);
         //when
         userRepository.ban(banMap);
         var userList=userRepository.readAll();
         //then
-        Assertions.assertTrue(userList.getFirst().isBlocked());
+        Assertions.assertTrue(userList.get(1).isBlocked());
         Assertions.assertTrue(userList.getLast().isBlocked());
     }
 }

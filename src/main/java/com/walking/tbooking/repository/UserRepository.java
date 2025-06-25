@@ -70,7 +70,7 @@ public class UserRepository {
         }
     }
 
-    public ReadUserDto updateData(UpdateUserDto updateUserDto){
+    public ReadUserDto updateData(long id, UpdateUserDto updateUserDto){
         String sql= """
                 update booking_user set surname=?,
                 name=?,
@@ -80,7 +80,7 @@ public class UserRepository {
             statement.setString(1, updateUserDto.getSurname());
             statement.setString(2, updateUserDto.getName());
             statement.setString(3, updateUserDto.getPatronymic());
-            statement.setLong(4, updateUserDto.getId());
+            statement.setLong(4, id);
             var rs=statement.executeQuery();
             return userMapper.map(rs);
         } catch (SQLException e) {

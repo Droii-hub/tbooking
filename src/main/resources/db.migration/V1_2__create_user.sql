@@ -9,3 +9,6 @@ create table booking_user (
     last_enter TIMESTAMP,
     blocked BOOLEAN DEFAULT false
 );
+
+insert into booking_user values
+(default, 'testing@email.com', '$2a$10$8FyDFp/ikn1ow3BDemuH4uyxRYYckEa2CI7WZ9Vzl4VVHnWfLPLpa', 'Ivanov', 'Ivan', 1);
