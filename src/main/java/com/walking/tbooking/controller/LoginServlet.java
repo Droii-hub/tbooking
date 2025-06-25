@@ -29,6 +29,8 @@ public class LoginServlet extends HttpServlet {
             ReadUserDto readUserDto = userService.readByEmail(loginUserDto.getEmail());
             if (!PasswordProvider.checkPassword(loginUserDto.getPassword(), userService.passwordById(readUserDto.getId())))
                 response.sendError(401);
+            if (readUserDto.isBlocked())
+                response.sendError(401, "You are blocked");
             HttpSession session=request.getSession();
             session.setAttribute("userId",readUserDto.getId());
             session.setAttribute("roleId", readUserDto.getRoleId());
