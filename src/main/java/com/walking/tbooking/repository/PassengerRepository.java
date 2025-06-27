@@ -4,7 +4,6 @@ import com.walking.tbooking.dto.passenger.CreatePassengerDto;
 import com.walking.tbooking.dto.passenger.ReadPassengerDto;
 import com.walking.tbooking.dto.passenger.SearchPassengerDto;
 import com.walking.tbooking.dto.passenger.UpdatePassengerDto;
-import com.walking.tbooking.exception.MapperException;
 import com.walking.tbooking.mapper.PassengerMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,7 +22,7 @@ public class PassengerRepository {
         this.mapper=mapper;
     }
 
-    public ReadPassengerDto create(CreatePassengerDto createPassengerDto, long userId) throws MapperException, SQLException {
+    public ReadPassengerDto create(CreatePassengerDto createPassengerDto, long userId){
         String sql= """
                 insert into passenger (user_id, surname, name, patronymic, male,
                  birth_date, passport_series, passport_number, passport_source, passport_issue_date)
@@ -44,10 +43,13 @@ public class PassengerRepository {
             statement.setDate(10, Date.valueOf(createPassengerDto.getPassport_issue_date()));
             var rs=statement.executeQuery();
             return mapper.map(rs);
+        } catch (SQLException e){
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
-    public List<ReadPassengerDto> readByUserId(long user_id) throws MapperException, SQLException{
+    public List<ReadPassengerDto> readByUserId(long user_id){
         String sql= """
                 select * from passenger where user_id=?
                 """;
@@ -56,10 +58,13 @@ public class PassengerRepository {
             statement.setLong(1, user_id);
             var rs=statement.executeQuery();
             return mapper.mapMany(rs);
+        } catch (SQLException e){
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
-    public List<ReadPassengerDto> readBySNP(SearchPassengerDto passenger) throws MapperException, SQLException{
+    public List<ReadPassengerDto> readBySNP(SearchPassengerDto passenger){
         String sql= """
                 select * from passenger where
                 surname ilike ? and
@@ -73,10 +78,13 @@ public class PassengerRepository {
             statement.setString(3, passenger.getPatronymic()==null ? "%" : passenger.getPatronymic());
             var rs=statement.executeQuery();
             return mapper.mapMany(rs);
+        } catch (SQLException e){
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
-    public ReadPassengerDto update(UpdatePassengerDto passenger, long user_id) throws MapperException, SQLException{
+    public ReadPassengerDto update(UpdatePassengerDto passenger, long user_id){
         String checkSql="select user_id from passenger where id=?";
         String updateSql= """
                 update passenger set
@@ -113,10 +121,13 @@ public class PassengerRepository {
             updateStatement.setLong(10, passenger.getId());
             var resultSet=updateStatement.executeQuery();
             return mapper.map(resultSet);
+        } catch (SQLException e){
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
-    public void delete(long passenger_id, long user_id) throws SQLException{
+    public void delete(long passenger_id, long user_id){
         String checkSql="select user_id from passenger where id=?";
         String deleteSql= """
                 delete from passenger where id=?
@@ -134,6 +145,9 @@ public class PassengerRepository {
             }
             deleteStatement.setLong(1, passenger_id);
             deleteStatement.executeUpdate();
+        } catch (SQLException e){
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 }

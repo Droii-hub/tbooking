@@ -9,9 +9,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class PassengerMapper {
-    public ReadPassengerDto map(ResultSet rs) throws MapperException, SQLException{
+    public ReadPassengerDto map(ResultSet rs) throws SQLException{
         if (!rs.next())
-            throw new MapperException("ResultSet have not value");
+            throw new SQLException("ResultSet have not value");
         ReadPassengerDto result=new ReadPassengerDto();
         result.setId(rs.getLong("id"));
         result.setUser_id(rs.getLong("user_id"));
@@ -27,7 +27,7 @@ public class PassengerMapper {
         return result;
     }
 
-    public List<ReadPassengerDto> mapMany(ResultSet rs) throws MapperException, SQLException{
+    public List<ReadPassengerDto> mapMany(ResultSet rs) throws SQLException{
         LinkedList<ReadPassengerDto> result=new LinkedList<>();
         while (rs.next()){
             ReadPassengerDto passenger=new ReadPassengerDto();
@@ -45,7 +45,7 @@ public class PassengerMapper {
             result.add(passenger);
         }
         if(result.isEmpty())
-            throw new MapperException("ResultSet have not value");
+            throw new SQLException("ResultSet have not value");
         return result;
     }
 }

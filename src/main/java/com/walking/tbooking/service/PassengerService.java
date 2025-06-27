@@ -4,10 +4,8 @@ import com.walking.tbooking.dto.passenger.CreatePassengerDto;
 import com.walking.tbooking.dto.passenger.ReadPassengerDto;
 import com.walking.tbooking.dto.passenger.SearchPassengerDto;
 import com.walking.tbooking.dto.passenger.UpdatePassengerDto;
-import com.walking.tbooking.exception.MapperException;
 import com.walking.tbooking.repository.PassengerRepository;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class PassengerService {
@@ -26,23 +24,23 @@ public class PassengerService {
 
     private final PassengerRepository repository;
 
-    public ReadPassengerDto create(CreatePassengerDto createPassengerDto, long user_id) throws SQLException, MapperException {
+    public ReadPassengerDto create(CreatePassengerDto createPassengerDto, long user_id){
         return repository.create(createPassengerDto, user_id);
     }
 
-    public List<ReadPassengerDto> getByUserId(long user_id) throws SQLException, MapperException {
+    public List<ReadPassengerDto> getByUserId(long user_id){
         return repository.readByUserId(user_id);
     }
 
-    public List<ReadPassengerDto> getBySNP(SearchPassengerDto passenger) throws SQLException, MapperException {
+    public List<ReadPassengerDto> getBySNP(SearchPassengerDto passenger){
         return repository.readBySNP(passenger);
     }
 
-    public ReadPassengerDto update(UpdatePassengerDto passenger, long user_id) throws SQLException, MapperException {
+    public ReadPassengerDto update(UpdatePassengerDto passenger, long user_id){
         return repository.update(passenger, user_id);
     }
 
-    public void delete(long passenger_id, long user_id) throws SQLException {
+    public void delete(long passenger_id, long user_id){
         repository.delete(passenger_id,user_id);
     }
 }
