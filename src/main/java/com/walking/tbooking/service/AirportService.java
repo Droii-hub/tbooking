@@ -1,10 +1,8 @@
 package com.walking.tbooking.service;
 
 import com.walking.tbooking.dto.airport.AirportDto;
-import com.walking.tbooking.exception.MapperException;
 import com.walking.tbooking.repository.AirportRepository;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class AirportService {
@@ -21,27 +19,27 @@ public class AirportService {
 
     private final AirportRepository repository;
 
-    public AirportDto create(AirportDto airport) throws SQLException, MapperException {
+    public AirportDto create(AirportDto airport){
         return repository.create(airport);
     }
 
-    public List<AirportDto> getByName(String name) throws SQLException, MapperException {
+    public List<AirportDto> getByName(String name){
         return repository.readByName(name);
     }
 
-    public List<AirportDto> getByLocation(String location) throws SQLException, MapperException {
+    public List<AirportDto> getByLocation(String location){
         return repository.readByLocation(location);
     }
 
-    public AirportDto getByIata(String iata) throws SQLException, MapperException {
+    public AirportDto getByIata(String iata){
         return repository.readByIata(iata);
     }
 
-    public AirportDto update(AirportDto airport) throws SQLException, MapperException {
+    public AirportDto update(AirportDto airport){
         return repository.update(airport);
     }
 
-    public void delete(String iata) throws SQLException {
+    public void delete(String iata){
         repository.delete(iata);
     }
 }

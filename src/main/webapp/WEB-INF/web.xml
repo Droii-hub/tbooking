@@ -12,7 +12,10 @@
         <listener>
                 <listener-class>com.walking.tbooking.listener.InitParamsListener</listener-class>
         </listener>
-
+        <filter>
+                <filter-name>AuthorizationFilter</filter-name>
+                <filter-class>com.walking.tbooking.filter.AuthorizationFilter</filter-class>
+        </filter>
         <filter>
                 <filter-name>DeserializationFilter</filter-name>
                 <filter-class>com.walking.tbooking.filter.DeserializationFilter</filter-class>

@@ -45,6 +45,10 @@ public class AuthorizationFilter extends HttpFilter {
             response.sendError(401);
             return;
         }
+        if(request.getServletPath().equals("/airport/admin")&!session.getAttribute("roleId").equals("1")){
+            response.sendError(401);
+            return;
+        }
 
         chain.doFilter(request,response);
     }
