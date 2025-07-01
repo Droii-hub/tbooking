@@ -4,10 +4,8 @@ import com.walking.tbooking.dto.flight.CreateFlightDto;
 import com.walking.tbooking.dto.flight.ReadByAirportsFlightDto;
 import com.walking.tbooking.dto.flight.ReadFlightDto;
 import com.walking.tbooking.dto.flight.SeatsDto;
-import com.walking.tbooking.exception.MapperException;
 import com.walking.tbooking.repository.FlightRepository;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,11 +24,11 @@ public class FlightService {
 
     private final FlightRepository repository;
 
-    public ReadFlightDto create(CreateFlightDto flight) throws SQLException, MapperException {
+    public ReadFlightDto create(CreateFlightDto flight){
         return repository.create(flight);
     }
 
-    public List<Boolean> getAvailableSeats(long id) throws SQLException {
+    public List<Boolean> getAvailableSeats(long id){
         SeatsDto seats=repository.readSeats(id);
         LinkedList<Integer> unavailableSeats=new LinkedList<>(seats.getUnavailableSeats());
         List<Boolean> availableSeats=new ArrayList<>(seats.getTotalSeats());
@@ -45,19 +43,19 @@ public class FlightService {
         return availableSeats;
     }
 
-    public List<ReadFlightDto> getFlightByAirports(ReadByAirportsFlightDto airports) throws SQLException, MapperException {
+    public List<ReadFlightDto> getFlightByAirports(ReadByAirportsFlightDto airports){
         return repository.readByAirports(airports);
     }
 
-    public List<ReadFlightDto> getAll() throws SQLException, MapperException {
+    public List<ReadFlightDto> getAll(){
         return repository.readAll();
     }
 
-    public ReadFlightDto update(ReadFlightDto flight) throws SQLException, MapperException {
+    public ReadFlightDto update(ReadFlightDto flight){
         return repository.update(flight);
     }
 
-    public void delete(long id) throws SQLException {
+    public void delete(long id){
         repository.delete(id);
     }
 }

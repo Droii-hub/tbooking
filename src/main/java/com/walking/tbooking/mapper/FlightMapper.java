@@ -1,7 +1,6 @@
 package com.walking.tbooking.mapper;
 
 import com.walking.tbooking.dto.flight.ReadFlightDto;
-import com.walking.tbooking.exception.MapperException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,9 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class FlightMapper {
-    public ReadFlightDto map(ResultSet rs) throws MapperException, SQLException{
+    public ReadFlightDto map(ResultSet rs) throws SQLException{
         if(!rs.next())
-            throw new MapperException("ResultSet have not value");
+            throw new SQLException("ResultSet have not value");
         ReadFlightDto result=new ReadFlightDto();
         result.setId(rs.getLong("id"));
         result.setDeparture_airport(rs.getString("departure_airport"));
@@ -23,7 +22,7 @@ public class FlightMapper {
         return result;
     }
 
-    public List<ReadFlightDto> mapMany(ResultSet rs) throws MapperException, SQLException{
+    public List<ReadFlightDto> mapMany(ResultSet rs) throws SQLException{
         LinkedList<ReadFlightDto> result=new LinkedList<>();
         while(rs.next()){
             ReadFlightDto flight=new ReadFlightDto();
@@ -37,7 +36,7 @@ public class FlightMapper {
             result.add(flight);
         }
         if(result.isEmpty())
-            throw new MapperException("ResultSet have not value");
+            throw new SQLException("ResultSet have not value");
         return result;
     }
 }

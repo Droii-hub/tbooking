@@ -4,7 +4,6 @@ import com.walking.tbooking.dto.flight.CreateFlightDto;
 import com.walking.tbooking.dto.flight.ReadByAirportsFlightDto;
 import com.walking.tbooking.dto.flight.ReadFlightDto;
 import com.walking.tbooking.dto.flight.SeatsDto;
-import com.walking.tbooking.exception.MapperException;
 import com.walking.tbooking.mapper.FlightMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,7 +23,7 @@ public class FlightRepository {
         this.mapper=mapper;
     }
 
-    public ReadFlightDto create(CreateFlightDto flight) throws MapperException, SQLException{
+    public ReadFlightDto create(CreateFlightDto flight){
         String sql= """
                 insert into flight values(default, ?, ?, ?, ?, ?, ?)
                 returning *
@@ -39,20 +38,26 @@ public class FlightRepository {
             statement.setInt(6, flight.getTotal_seats());
             var rs=statement.executeQuery();
             return mapper.map(rs);
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
-    public ReadFlightDto readById(long id) throws SQLException, MapperException{
+    public ReadFlightDto readById(long id){
         String sql="select * from flight where id=?";
         try(Connection connection=dataSource.getConnection();
         PreparedStatement statement=connection.prepareStatement(sql)){
             statement.setLong(1,id);
             var rs=statement.executeQuery();
             return mapper.map(rs);
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
-    public SeatsDto readSeats(long id) throws SQLException{
+    public SeatsDto readSeats(long id){
         String sql="select seat from ticket where flight_id=? order by seat";
         String totalSql="select total_seats from flight where id=?";
         try(Connection connection= dataSource.getConnection();
@@ -71,6 +76,9 @@ public class FlightRepository {
                 unavailableSeats.add(rs.getInt("seat"));
             result.setUnavailableSeats(unavailableSeats);
             return  result;
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
@@ -83,11 +91,12 @@ public class FlightRepository {
                 throw new SQLException("Flight with this id does not exists");
             return rs.getInt("available_seats");
         } catch (SQLException e){
+            log.error(e.getMessage());
             throw new RuntimeException("Ошибка при чтении с базы "+e.getMessage());
         }
     }
 
-    public List<ReadFlightDto> readByAirports(ReadByAirportsFlightDto airports) throws MapperException, SQLException{
+    public List<ReadFlightDto> readByAirports(ReadByAirportsFlightDto airports){
         String sql="select * from flight where departure_airport ilike ? and arrival_airport ilike ?";
         try(Connection connection= dataSource.getConnection();
             PreparedStatement statement= connection.prepareStatement(sql)){
@@ -95,19 +104,25 @@ public class FlightRepository {
             statement.setString(2, airports.getArrival_airport()==null ? "%" : airports.getArrival_airport());
             var rs=statement.executeQuery();
             return mapper.mapMany(rs);
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
-    public List<ReadFlightDto> readAll() throws MapperException, SQLException{
+    public List<ReadFlightDto> readAll(){
         String sql="select * from flight";
         try(Connection connection= dataSource.getConnection();
             PreparedStatement statement= connection.prepareStatement(sql)){
             var rs=statement.executeQuery();
             return mapper.mapMany(rs);
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
-    public ReadFlightDto update(ReadFlightDto flight) throws MapperException, SQLException{
+    public ReadFlightDto update(ReadFlightDto flight){
         String sql= """
                 update flight set
                 departure_airport=?,
@@ -128,6 +143,9 @@ public class FlightRepository {
             statement.setLong(7, flight.getId());
             var rs=statement.executeQuery();
             return mapper.map(rs);
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
@@ -138,16 +156,20 @@ public class FlightRepository {
             statement.setLong(2, id);
             statement.executeUpdate();
         } catch (SQLException e) {
+            log.error(e.getMessage());
             throw new RuntimeException("Ошибка при записи в базу "+e.getMessage());
         }
     }
 
-    public void delete(long id) throws SQLException{
+    public void delete(long id){
         String sql="delete from flight where id=?";
         try(Connection connection= dataSource.getConnection();
             PreparedStatement statement= connection.prepareStatement(sql)){
             statement.setLong(1, id);
             statement.executeUpdate();
+        } catch (SQLException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 }
