@@ -1,19 +1,16 @@
 package com.walking.tbooking.mapper;
 
 import com.walking.tbooking.dto.ticket.FullTicketDto;
-import com.walking.tbooking.dto.ticket.TicketDto;
-import com.walking.tbooking.exception.MapperException;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 public class TicketMapper {
-    public FullTicketDto map(ResultSet rs) throws MapperException, SQLException{
+    public FullTicketDto map(ResultSet rs) throws SQLException{
         if (!rs.next())
-            throw new MapperException("ResultSet have not value");
+            throw new SQLException("ResultSet have not value");
         FullTicketDto result=new FullTicketDto();
         result.setFlight_id(rs.getLong("flight_id"));
         result.setDeparture_airport(rs.getString("departure_airport"));
@@ -29,7 +26,7 @@ public class TicketMapper {
         return result;
     }
 
-    public List<FullTicketDto> mapMany(ResultSet rs) throws MapperException, SQLException{
+    public List<FullTicketDto> mapMany(ResultSet rs) throws SQLException{
         LinkedList<FullTicketDto> result=new LinkedList<>();
         while(rs.next()){
             FullTicketDto ticket=new FullTicketDto();
@@ -47,7 +44,7 @@ public class TicketMapper {
             result.add(ticket);
         }
         if(result.isEmpty())
-            throw new MapperException("ResultSet have not value");
+            throw new SQLException("ResultSet have not value");
         return result;
     }
 }

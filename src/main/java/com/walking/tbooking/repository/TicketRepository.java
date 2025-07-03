@@ -2,7 +2,6 @@ package com.walking.tbooking.repository;
 
 import com.walking.tbooking.dto.ticket.FullTicketDto;
 import com.walking.tbooking.dto.ticket.TicketDto;
-import com.walking.tbooking.exception.MapperException;
 import com.walking.tbooking.mapper.TicketMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,7 +24,7 @@ public class TicketRepository {
         this.mapper=mapper;
     }
 
-    public List<FullTicketDto> readActualByUser(long user_id) throws MapperException, SQLException{
+    public List<FullTicketDto> readActualByUser(long user_id){
         String sql="""
                    select flight_id, departure_airport, departure_time, arrival_airport, arrival_time, seat,
                    class, baggage_allowance, surname, name, patronymic
@@ -41,10 +40,13 @@ public class TicketRepository {
             statement.setLong(2, user_id);
             var rs=statement.executeQuery();
             return mapper.mapMany(rs);
+        } catch (SQLException e){
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
-    public List<FullTicketDto> readAllByUser(long user_id) throws MapperException, SQLException{
+    public List<FullTicketDto> readAllByUser(long user_id){
         String sql="""
                    select flight_id, departure_airport, departure_time, arrival_airport, arrival_time, seat,
                    class, baggage_allowance, surname, name, patronymic
@@ -58,10 +60,13 @@ public class TicketRepository {
             statement.setLong(1, user_id);
             var rs=statement.executeQuery();
             return mapper.mapMany(rs);
+        } catch (SQLException e){
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
-    public List<FullTicketDto> readAll() throws MapperException, SQLException{
+    public List<FullTicketDto> readAll(){
         String sql="""
                    select flight_id, departure_airport, departure_time, arrival_airport, arrival_time, seat,
                    class, baggage_allowance, surname, name, patronymic
@@ -74,6 +79,9 @@ public class TicketRepository {
             PreparedStatement statement= connection.prepareStatement(sql)){
             var rs=statement.executeQuery();
             return mapper.mapMany(rs);
+        } catch (SQLException e){
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
@@ -87,6 +95,7 @@ public class TicketRepository {
             statement.setLong(5, ticket.getPassenger_id());
             statement.executeUpdate();
         } catch (SQLException e){
+            log.error(e.getMessage());
             throw new RuntimeException("Не удалось добавить билет в базу "+e.getMessage());
         }
     }
@@ -106,10 +115,9 @@ public class TicketRepository {
             statement.setInt(2, seat);
             var rs=statement.executeQuery();
             return mapper.map(rs);
-        } catch (SQLException | MapperException e) {
-            if (e instanceof SQLException sqlException)
-                throw new RuntimeException("Ошибка при чтении с базы "+ e.getMessage());
-            throw new RuntimeException("Ошибка преобразования данных с базы "+e.getMessage());
+        } catch (SQLException e){
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
@@ -119,12 +127,13 @@ public class TicketRepository {
             statement.setLong(1, flight_id);
             statement.setInt(2, seat);
             statement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException("Ошибка при удалении билета "+e.getMessage());
+        } catch (SQLException e){
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
-    public long readUserIdByTicket(long flight_id, int seat)throws SQLException{
+    public long readUserIdByTicket(long flight_id, int seat){
         String sql="""
     select id, user_id from passenger
     join (select passenger_id from ticket where flight_id=? and seat=?) t
@@ -137,6 +146,9 @@ public class TicketRepository {
             if (!rs.next())
                 throw new SQLException("Такого билета не найдено");
             return rs.getLong("user_id");
+        } catch (SQLException e){
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 }

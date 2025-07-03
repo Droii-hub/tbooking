@@ -32,14 +32,14 @@ public class InitParamsListener implements ServletContextListener {
         context.setAttribute("userService", UserService.getInstance(
            new UserRepository(dataSource, new UserMapper())
         ));
-        context.setAttribute("passengerService", PassengerService.getInstance(
-                new PassengerRepository(dataSource, new PassengerMapper())
-        ));
+
         context.setAttribute("airportService", AirportService.getInstance(
                 new AirportRepository(dataSource, new AirportMapper())
         ));
         TicketRepository ticketRepository=new TicketRepository(dataSource, new TicketMapper());
         FlightRepository flightRepository=new FlightRepository(dataSource, new FlightMapper());
+        PassengerRepository passengerRepository=new PassengerRepository(dataSource, new PassengerMapper());
+        context.setAttribute("passengerService", PassengerService.getInstance(passengerRepository));
         context.setAttribute("flightService", FlightService.getInstance(
                 flightRepository
         ));
@@ -49,7 +49,8 @@ public class InitParamsListener implements ServletContextListener {
         context.setAttribute("bookingService", BookingService.getInstance(
                 dataSource,
                 ticketRepository,
-                flightRepository
+                flightRepository,
+                passengerRepository
         ));
         ObjectMapper objectMapper=new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
