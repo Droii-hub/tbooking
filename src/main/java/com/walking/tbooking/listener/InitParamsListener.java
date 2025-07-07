@@ -50,7 +50,8 @@ public class InitParamsListener implements ServletContextListener {
                 dataSource,
                 ticketRepository,
                 flightRepository,
-                passengerRepository
+                passengerRepository,
+                new FavoriteAirportsRepository(dataSource)
         ));
         ObjectMapper objectMapper=new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);

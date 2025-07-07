@@ -226,9 +226,10 @@ public class TicketRepositoryTest {
         ticketRepository.book(actualTicketDto, dataSource.getConnection());
         ticketRepository.book(anotherUserTicketDto, dataSource.getConnection());
         //when
-        long actual=ticketRepository.readUserIdByTicket(ticketDto.getFlight_id(), ticketDto.getSeat());
+        var actual=ticketRepository.readOwnerByTicket(ticketDto.getFlight_id(), ticketDto.getSeat());
         //then
-        Assertions.assertEquals(user.getId(), actual);
+        Assertions.assertEquals(user.getId(), actual.get("user_id"));
+        Assertions.assertEquals(ticketDto.getPassenger_id(), actual.get("passenger_id"));
     }
 
 

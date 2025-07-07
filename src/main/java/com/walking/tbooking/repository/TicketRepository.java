@@ -12,7 +12,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TicketRepository {
     private final Logger log= LogManager.getLogger(TicketRepository.class);
@@ -133,7 +135,7 @@ public class TicketRepository {
         }
     }
 
-    public long readUserIdByTicket(long flight_id, int seat){
+    public Map<String, Long> readOwnerByTicket(long flight_id, int seat){
         String sql="""
     select id, user_id from passenger
     join (select passenger_id from ticket where flight_id=? and seat=?) t
@@ -145,7 +147,38 @@ public class TicketRepository {
             var rs=statement.executeQuery();
             if (!rs.next())
                 throw new SQLException("Такого билета не найдено");
-            return rs.getLong("user_id");
+            HashMap<String, Long> result=new HashMap<>();
+            result.put("user_id", rs.getLong("user_id"));
+            result.put("passenger_id", rs.getLong("id"));
+            return result;
+        } catch (SQLException e){
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public Map<String, Integer> airportsByPassenger(long passenger_id){
+        String sql= """
+                select flight_id, departure_airport, arrival_airport
+                from ticket t
+                join flight f on t.flight_id=f.id
+                where passenger_id=?
+                """;
+        try(Connection connection=dataSource.getConnection();
+        PreparedStatement statement= connection.prepareStatement(sql)){
+            statement.setLong(1, passenger_id);
+            var rs=statement.executeQuery();
+            HashMap<String, Integer> airportCount=new HashMap<>();
+            while (rs.next()){
+                airportCount.compute(rs.getString("departure_airport"), (key, count)->
+                        count==null?1:count+1);
+                airportCount.compute(rs.getString("arrival_airport"), (key, count)->
+                        count==null?1:count+1);
+            }
+            if (airportCount.isEmpty())
+                throw new SQLException("Не найдено билетов у этого пассажира");
+            return airportCount;
+
         } catch (SQLException e){
             log.error(e.getMessage());
             throw new RuntimeException(e.getMessage());
