@@ -31,7 +31,7 @@ public class FlightRepositoryTest {
         HikariConfig config = new HikariConfig("hikari_test.properties");
         dataSource = new HikariDataSource(config);
         FluentConfiguration flywayConfig = Flyway.configure()
-                .locations("filesystem:" + System.getProperty("user.dir") + "/src/main/resources/db.migration")
+                .locations("filesystem:" + System.getProperty("user.dir") + "/src/main/resources/db/migration")
                 .dataSource(dataSource);
         Flyway flyway = flywayConfig.load();
         flyway.migrate();
