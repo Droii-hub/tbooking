@@ -15,6 +15,7 @@ public class AuthorizationFilter extends HttpFilter {
         if ("/login".equals(request.getServletPath())) {
             // Если запрос на логин - пускаем дальше по цепочке без дополнительных проверок
             chain.doFilter(request, response);
+            return;
         }
         // Получаем объект сессии. Если сессии не существует - отправляем ошибку.
         HttpSession session = request.getSession(false);
@@ -27,29 +28,30 @@ public class AuthorizationFilter extends HttpFilter {
                 request.setAttribute("roleId", session.getAttribute("roleId"));
             }
             chain.doFilter(request, response);
+            return;
         }
         if (session == null) {
             response.sendError(401);
             return;
         }
         //Условия авторизации
-        if (request.getServletPath().equals("/user")&request.getMethod().equals("GET")&!session.getAttribute("roleId").equals("1")) {
+        if (request.getServletPath().equals("/user")&request.getMethod().equals("GET")&(int)session.getAttribute("roleId")!=1) {
             response.sendError(401);
             return;
         }
-        if (request.getServletPath().equals("/user/ban")&!session.getAttribute("roleId").equals("1")) {
+        if (request.getServletPath().equals("/user/ban")&(int)session.getAttribute("roleId")!=1) {
             response.sendError(401);
             return;
         }
-        if(request.getServletPath().equals("/passenger/search")&!session.getAttribute("roleId").equals("1")){
+        if(request.getServletPath().equals("/passenger/search")&(int)session.getAttribute("roleId")!=1){
             response.sendError(401);
             return;
         }
-        if(request.getServletPath().equals("/airport/admin")&!session.getAttribute("roleId").equals("1")){
+        if(request.getServletPath().equals("/airport/admin")&(int)session.getAttribute("roleId")!=1){
             response.sendError(401);
             return;
         }
-        if(request.getServletPath().equals("/flight/admin")&!session.getAttribute("roleId").equals("1")){
+        if(request.getServletPath().equals("/flight/admin")&(int)session.getAttribute("roleId")!=1){
             response.sendError(401);
             return;
         }
