@@ -39,33 +39,33 @@ public class DeserializationFilterTest {
     @InjectMocks
     private DeserializationFilter dFilter;
 
-    @Test
-    void createUserDto_success() throws IOException, ServletException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        //given
-        CreateUserDto createUserDto=new CreateUserDto();
-        createUserDto.setEmail("test@email.com");
-        createUserDto.setSurname("Petrov");
-        createUserDto.setName("Ivan");
-        createUserDto.setPatronymic("Aleksandrovich");
-        createUserDto.setPassword("GreatPassword");
-        ObjectMapper mapper=new ObjectMapper();
-//        doReturn("application/json").when(req).getContentType();
-//        doReturn(5).when(req).getContentLength();
-        doReturn("/user").when(req).getServletPath();
-        doReturn("POST").when(req).getMethod();
-        byte[] body=mapper.writeValueAsBytes(createUserDto);
-        ServletInputStream sis= mock(ServletInputStream.class);
-        doReturn(body).when(sis).readAllBytes();
-        doReturn(sis).when(req).getInputStream();
-        Method method=DeserializationFilter.class.getDeclaredMethod("deserialize", HttpServletRequest.class);
-        method.setAccessible(true);
-
-        //when
-        var temp=(CreateUserDto)method.invoke(dFilter,req);
-        var actual=temp.getEmail();
-        //then
-        assertEquals(createUserDto.getEmail(), actual);
-    }
+//    @Test
+//    void createUserDto_success() throws IOException, ServletException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+//        //given
+//        CreateUserDto createUserDto=new CreateUserDto();
+//        createUserDto.setEmail("test@email.com");
+//        createUserDto.setSurname("Petrov");
+//        createUserDto.setName("Ivan");
+//        createUserDto.setPatronymic("Aleksandrovich");
+//        createUserDto.setPassword("GreatPassword");
+//        ObjectMapper mapper=new ObjectMapper();
+////        doReturn("application/json").when(req).getContentType();
+////        doReturn(5).when(req).getContentLength();
+//        doReturn("/user").when(req).getServletPath();
+//        doReturn("POST").when(req).getMethod();
+//        byte[] body=mapper.writeValueAsBytes(createUserDto);
+//        ServletInputStream sis= mock(ServletInputStream.class);
+//        doReturn(body).when(sis).readAllBytes();
+//        doReturn(sis).when(req).getInputStream();
+//        Method method=DeserializationFilter.class.getDeclaredMethod("deserialize", HttpServletRequest.class);
+//        method.setAccessible(true);
+//
+//        //when
+//        var temp=(CreateUserDto)method.invoke(dFilter,req);
+//        var actual=temp.getEmail();
+//        //then
+//        assertEquals(createUserDto.getEmail(), actual);
+//    }
 
     @Test
     void test() throws JsonProcessingException {

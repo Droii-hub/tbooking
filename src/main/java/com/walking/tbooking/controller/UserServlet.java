@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.util.Map;
 
 @WebServlet("/user")
 public class UserServlet extends HttpServlet {
@@ -31,12 +32,12 @@ public class UserServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPatch(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String id=req.getParameter("id");
-        String newPassword=req.getParameter("password");
-        if (id==null&newPassword==null)
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        HttpSession session=req.getSession(false);
+        var password=(Map<String,String>)req.getAttribute("requestJavaObject");
+        if (password.isEmpty())
             resp.sendError(400, "Empty parameters");
-        userService.updatePassword(Long.parseLong(id), newPassword);
+        userService.updatePassword((long)session.getAttribute("userId"), password.get("password"));
         resp.setStatus(200);
     }
     

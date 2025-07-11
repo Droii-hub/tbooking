@@ -54,6 +54,7 @@ public class DeserializationFilter extends HttpFilter {
         result.put("/registrationPOST", new TypeReference<CreateUserDto>() {});
         result.put("/loginPOST", new TypeReference<LoginUserDto>() {});
         result.put("/userPUT", new TypeReference<UpdateUserDto>(){});
+        result.put("/userPOST", new TypeReference<Map<String,String>>() {});
         result.put("/user/ban/PATCH", new TypeReference<Map<Long, Boolean>>(){});
         result.put("/passengerPOST", new TypeReference<CreatePassengerDto>(){});
         result.put("/passengerGET", new TypeReference<SearchPassengerDto>(){});
