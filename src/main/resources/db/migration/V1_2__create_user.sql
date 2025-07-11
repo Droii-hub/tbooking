@@ -11,4 +11,4 @@ create table booking_user (
 );
 
 insert into booking_user values
-(default, 'testing@email.com', '$2a$10$8FyDFp/ikn1ow3BDemuH4uyxRYYckEa2CI7WZ9Vzl4VVHnWfLPLpa', 'Ivanov', 'Ivan', 1);
+(default, 'testing@email.com', '$2a$10$8FyDFp/ikn1ow3BDemuH4uyxRYYckEa2CI7WZ9Vzl4VVHnWfLPLpa', 'Ivanov', 'Ivan', 'Ivanovich', 1);
