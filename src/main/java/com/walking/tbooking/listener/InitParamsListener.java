@@ -2,6 +2,7 @@ package com.walking.tbooking.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.walking.tbooking.mapper.*;
 import com.walking.tbooking.repository.*;
 import com.walking.tbooking.service.*;
@@ -55,6 +56,7 @@ public class InitParamsListener implements ServletContextListener {
         ));
         ObjectMapper objectMapper=new ObjectMapper();
         objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        objectMapper.registerModule(new JavaTimeModule());
         context.setAttribute("objectMapper", objectMapper);
     }
 
