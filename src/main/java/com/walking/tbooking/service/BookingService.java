@@ -75,6 +75,10 @@ public class BookingService {
 
     private void favoriteAirportsRecalculation(long passengerId){
         var airportsByPassenger=ticketRepository.airportsByPassenger(passengerId);
+        if (airportsByPassenger.isEmpty()){
+            favoriteAirportsRepository.delete(passengerId);
+            return;
+        }
         ArrayList<String> favoriteAirports=(ArrayList<String>)airportsByPassenger.entrySet().stream()
                 .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
                 .limit(3)

@@ -19,7 +19,7 @@ public class FavoriteAirportsRepository {
 
     public void updateFavoriteAirports(long passengerId, ArrayList<String> airportList){
         String sql="""
-        insert into favorite_airports values (passenger_id=, first_airport, second_airport, third_airport)
+        insert into favorite_airports (passenger_id, first_airport, second_airport, third_airport)
         values (?, ?, ?, ?)
         ON CONFLICT (passenger_id) DO UPDATE
         set first_airport=?, second_airport=?, third_airport=?
@@ -33,6 +33,18 @@ public class FavoriteAirportsRepository {
             statement.setString(5, airportList.get(0));
             statement.setString(6, airportList.get(1));
             statement.setString(7, airportList.get(2));
+            statement.executeUpdate();
+        } catch (SQLException e){
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public void delete(long passengerId){
+        String sql="delete from favorite_airports where passenger_id=?";
+        try(Connection connection= dataSource.getConnection();
+            PreparedStatement statement= connection.prepareStatement(sql)) {
+            statement.setLong(1, passengerId);
             statement.executeUpdate();
         } catch (SQLException e){
             log.error(e.getMessage());

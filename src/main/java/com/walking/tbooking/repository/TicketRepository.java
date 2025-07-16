@@ -175,8 +175,6 @@ public class TicketRepository {
                 airportCount.compute(rs.getString("arrival_airport"), (key, count)->
                         count==null?1:count+1);
             }
-            if (airportCount.isEmpty())
-                throw new SQLException("Не найдено билетов у этого пассажира");
             return airportCount;
 
         } catch (SQLException e){
