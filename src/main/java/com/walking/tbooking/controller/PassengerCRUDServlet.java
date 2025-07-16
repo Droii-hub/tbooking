@@ -37,9 +37,14 @@ public class PassengerCRUDServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp){
         HttpSession session=req.getSession(false);
-        var answer=passengerService.getByUserId((long)session.getAttribute("userId"));
-        req.setAttribute("responseJavaObject", answer);
-        resp.setStatus(200);
+        try {
+            var answer = passengerService.getByUserId((long) session.getAttribute("userId"));
+            req.setAttribute("responseJavaObject", answer);
+            resp.setStatus(200);
+        } catch (RuntimeException e) {
+            if (e.getMessage().equals("ResultSet have not value"))
+                resp.setStatus(204);
+        }
     }
 
     @Override

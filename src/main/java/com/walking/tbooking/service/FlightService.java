@@ -32,14 +32,19 @@ public class FlightService {
         SeatsDto seats=repository.readSeats(id);
         LinkedList<Integer> unavailableSeats=new LinkedList<>(seats.getUnavailableSeats());
         List<Boolean> availableSeats=new ArrayList<>(seats.getTotalSeats());
-        for (int i = 0; i < seats.getTotalSeats(); i++) {
-            if (i==unavailableSeats.getFirst()-1){
-                unavailableSeats.removeFirst();
-                availableSeats.add(i,false);
-            } else {
+        if (unavailableSeats.isEmpty()){
+            for (int i = 0; i < seats.getTotalSeats(); i++) {
                 availableSeats.add(i, true);
             }
-        }
+        } else
+            for (int i = 0; i < seats.getTotalSeats(); i++) {
+                if (i==unavailableSeats.getFirst()-1){
+                    unavailableSeats.removeFirst();
+                    availableSeats.add(i,false);
+                } else {
+                    availableSeats.add(i, true);
+                }
+            }
         return availableSeats;
     }
 

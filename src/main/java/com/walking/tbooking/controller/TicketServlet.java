@@ -74,7 +74,7 @@ public class TicketServlet extends HttpServlet {
         if(roleId==1){
             answer=ticketService.getAll();
             req.setAttribute("responseJavaObject", answer);
-        } else if (actual!=null&Boolean.getBoolean(actual)){
+        } else if (actual!=null&Boolean.parseBoolean(actual)){
             answer=ticketService.getActualByUser(userId);
 
         } else {

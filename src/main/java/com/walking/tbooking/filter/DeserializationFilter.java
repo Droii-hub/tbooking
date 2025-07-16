@@ -57,13 +57,13 @@ public class DeserializationFilter extends HttpFilter {
         result.put("/userPOST", new TypeReference<Map<String,String>>() {});
         result.put("/user/ban/PATCH", new TypeReference<Map<Long, Boolean>>(){});
         result.put("/passengerPOST", new TypeReference<CreatePassengerDto>(){});
-        result.put("/passengerGET", new TypeReference<SearchPassengerDto>(){});
         result.put("/passengerPUT", new TypeReference<UpdatePassengerDto>(){});
-        result.put("/airportPOST", new TypeReference<AirportDto>(){});
-        result.put("/airportPUT", new TypeReference<AirportDto>(){});
-        result.put("/flightPOST", new TypeReference<CreateFlightDto>() {});
+        result.put("/passenger/searchGET", new TypeReference<SearchPassengerDto>() {});
+        result.put("/airport/adminPOST", new TypeReference<AirportDto>(){});
+        result.put("/airport/adminPUT", new TypeReference<AirportDto>(){});
+        result.put("/flight/adminPOST", new TypeReference<CreateFlightDto>() {});
         result.put("/flightGET", new TypeReference<ReadByAirportsFlightDto>() {});
-        result.put("/flightPUT", new TypeReference<ReadFlightDto>() {});
+        result.put("/flight/adminPUT", new TypeReference<ReadFlightDto>() {});
         result.put("/ticketPOST", new TypeReference<TicketDto>(){});
         return result;
     }
